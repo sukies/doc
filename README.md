@@ -1,3 +1,3 @@
 # doc
 一些学习笔记
-<a href="./blog/issues/1">1</a>
+<a href="https://github.com/sukies/doc/blog/issues/1">1</a>
