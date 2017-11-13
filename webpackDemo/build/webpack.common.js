@@ -3,9 +3,7 @@ const path = require('path');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 
 
-/**
-*多页面，对于public文件中的index.html,my.html,order.html打包到app文件件夹内
-*/
+//多页面，对于public文件中的index.html,my.html,order.html打包到app文件件夹内
 var page = ["index","my","order"];
 var plugins = page.map(function (item, index, array) {
     return new HtmlWebpackPlugin({
