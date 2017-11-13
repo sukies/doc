@@ -5,7 +5,7 @@
 <p><a href="build/webpack.common.js">公共配置</a></p>
 <p><a href="build/webpack.dev.js">开发环境配置</a></p>
 <p><a href="build/webpack.prod.js">生产环境配置</a></p>
-<h3>目录结构<h3>
+<h3>目录结构</h3>
 <div>
 package.json<br>
   <br>
