@@ -1,11 +1,12 @@
 const path = require('path');
-const merge = require('webpack-merge');
+const merge = require('webpack-merge');//用户引入webpack.common.js的配置，无需重写相同的配置
 var webpack = require('webpack');
 const common = require('./webpack.common');
 
 module.exports = merge(common, {
     devtool: 'eval-source-map',
-    output: {//输出
+    //输出
+    output: {
         filename: '[name].js',
         path:path.resolve(__dirname, '../public')
     },
