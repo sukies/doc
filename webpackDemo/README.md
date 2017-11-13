@@ -24,3 +24,47 @@ app//生产<br>
 --js//出口文件<br>
 --css<br>
 <div>
+  <h3>学习总结</h3>
+  1.webpack安装
+安装命令：npm install webpack -g
+查看：webpack -v
+安装到项目目录：npm install --save-dev webpack
+
+2.创建项目
+进入项目文件夹，输入命令：npm init，一路回车
+完成后会自动创建package.json文件
+
+3.正式使用webpack
+ 1.命令：$ webpack （入口文件） （编译后文件）
+
+ 2.webpack编译
+在项目根目录下新建webpack.config.js
+
+输入内容
+
+module.exports = {
+  entry:  __dirname + "/app/main.js",//已多次提及的唯一入口文件
+  output: {
+    path: __dirname + "/public",//打包后的文件存放的地方
+    filename: "bundle.js"//打包后输出文件的文件名
+  }
+}
+
+在终端输入$ webpack
+ 3.在package.json文件配置
+
+
+
+在终端输入$npm webpack //如果不是start，则为$npm run （名字）
+
+3.实现自动更新
+1.安装webpack-dev-server
+
+安装命令：$npm install -g --save-dev webpack-dev-server　　//-g 全局模式
+
+在webpack.config.js文件添加代码
+
+devServer: {
+contentBase:__dirname+ "/public",//本地服务器所加载的页面所在的目录
+inline: true//实时刷新
+}
