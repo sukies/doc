@@ -3,6 +3,7 @@ const path = require('path');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 
 
+//多页面，对于public文件中的index.html,my.html,order.html打包到app文件件夹内
 var page = ["index","my","order"];
 var plugins = page.map(function (item, index, array) {
     return new HtmlWebpackPlugin({
@@ -13,13 +14,10 @@ var plugins = page.map(function (item, index, array) {
 
 
 module.exports = {
+    //入口文件
     entry: {
         ajax:path.resolve(__dirname, "../app/ajax.js"),
         main:path.resolve(__dirname,"../app/main.js"),
-    },
-    output: {//输出
-        filename: '[name]_[hash].js',
-        path:path.resolve(__dirname, '../public')
     },
     module: {//在配置文件里添加JSON loader
         rules: [
@@ -36,8 +34,8 @@ module.exports = {
                 }
             },
             {
-                // test: /.(png|jpg)$/, loader: "url-loader?limit=1024&name=../img/[name]_[hash].[ext]"
-                test: /.(png|jpg)$/, loader: "url-loader"
+                // test: /.(png|jpg)$/, loader: "url-loader?limit=1024&name=../img/[name]_[hash].[ext]"//用于将png，jpg的图片打包到img文件夹
+                test: /.(png|jpg)$/, loader: "url-loader"//将图片转为数据流内嵌在css文件内
             },
         ]
     },
