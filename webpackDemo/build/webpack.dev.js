@@ -8,7 +8,7 @@ module.exports = merge(common, {
     //输出
     output: {
         filename: '[name].js',
-        path:path.resolve(__dirname, '../public')
+        path:path.resolve(__dirname, '../public')//开发环境中，输出的js要在输出文件夹的根目录，不能在根目录里面
     },
     module:{
         rules:[
