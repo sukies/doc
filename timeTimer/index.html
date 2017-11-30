@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport"
+	      content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+	<meta content="telephone=no" name="format-detection"/>
+	<meta content="email=no" name="format-detection"/>
+	<title>生成倒计时</title>
+</head>
+<body>
+<p>输入内容必须为数组，且数组格式为:</p>
+<pre>
+	[
+		[["0", "21"], ["2", "18"]],//星期日21点 ~ 星期二18点
+		[["5", "21"], ["6", "18"]],//星期五21点 ~ 星期六18点
+	]
+</pre>
+<input type="text" id="time" placeholder='[[["1", "21"], ["2", "18"]]]'>
+<button id="button">生成倒计时</button>
+<p id="timer"></p>
+<script>
+    document.getElementById('button').addEventListener('click', function () {
+        var timers;
+        var timeData = JSON.parse(document.getElementById('time').value);
+        var timer = new Timer({seller: timeData});
+        timer.init(function (ret) {
+            addTimer(ret);
+        });
+        function addTimer(ret) {
+            timers = timers ? clearInterval(timers) : null;
+            try {
+                timers = setInterval(function () {
+                    timer.timeTimer(function (res) {
+                        if (res) {
+                            document.getElementById('timer').innerText ='还剩：'+ res;
+                        } else {
+                            clearInterval(timers);
+                        }
+                    });
+                }, 1000);
+            } catch (error) {
+            }
+        }
+    });
+    /**
+     * 倒计时定时器
+     * */
+    function Timer(data) {
+        this.seller = data.seller;//可售卖时间段
+        this.nextTime = null;//下个变化时间
+        this.nextTimeTimestamp = null;//下个变化时间的时间戳
+        this.isInTime = true;//当前时间是否为可销售时间段
+        this.thisTime = null;//当前时间
+        this.time = null;//当前时间，eg：512
+        /**
+         * 初始化
+         * @return callback:
+         *      nextTimeTimestamp:this.nextTimeTimestamp,//在销售时间内为当前销售时间段
+         inTime:this.inTime  //当前时间是否为可销售时间段
+         hint:this.hint  //销售时间段页面提醒string
+         * */
+        this.init = function (callback) {
+            var that = this;
+            this.thisTime = new Date();
+            this.getSellerArr(function (ret) {
+                that.getStringHint();
+                that.getTimestamp(ret.nextTime, callback);
+            });
+        };
+        /**
+         * 获取可销售时间范围数组
+         * */
+        this.getSellerArr = function (callback) {
+            var that = this;
+            //返回时间段数组
+            var seller = this.seller.map(function (item, index, array) {
+                return [Number('' + item[0][0] + that.checkTime(item[0][1])), Number('' + item[1][0] + that.checkTime(item[1][1]))];
+            });
+            this.seller = seller;
+            this.isInSellerTime(callback);
+        };
+        /**
+         * 判断是否在可销售时间里面
+         * */
+        this.isInSellerTime = function (callback) {
+            var seller = this.seller;
+            var thisTime = new Date();
+            //返回当前时间，eg：0512
+            var time = Number(thisTime.getDay() + '' + this.checkTime(thisTime.getHours()));
+            this.time = time;
+            //获取当前时间所在的时间段，无则返回[]
+            var inTime = seller.filter(function (item, index, array) {
+                if (item[0] < item[1]) {
+                    return item[0] <= time && time < item[1];
+                } else {
+                    return item[0] <= time || time < item[1];
+                }
+            });
+            this.inTime = inTime;
+            this.getNextTime(callback);
+        };
+        /**
+         * 获取下一个时间段
+         * @return 是否在可售时间段内
+         * */
+        this.getNextTime = function (callback) {
+            var time = this.time;
+            var that = this;
+
+            //不在可售时间段内
+            if (this.inTime.length <= 0) {
+                //下个时间，eg：600
+                var isInTime = [];
+                var nextTime = time + 700;
+                this.seller.forEach(function (item, index, array) {
+                    // 如果这个日期在今天的后面
+                    if (item[0] >= time) {
+                        if ((item[0] - time) <= (nextTime - time)) {
+                            nextTime = item[0];
+                        }
+                    } else {
+                        // 如果这个数在今天的前面
+                        if (((item[0] + 700) - time) <= (nextTime - time)) {
+                            nextTime = item[0] + 700;
+                        }
+                    }
+                });
+                if (nextTime > 700) {
+                    nextTime = nextTime - 700;
+                }
+                this.nextTime = nextTime;
+                this.isInTime = false;
+            } else {
+                //在可售时间段内
+                this.nextTime = this.inTime[0];
+                this.isInTime = true;
+            }
+            callback({inInTime: this.isInTime, nextTime: this.nextTime});
+        };
+        /**
+         * 获取时间戳
+         * @param time 格式为0609(星期六早上9点);
+         * @return 时间戳
+         * */
+        this.getTimestamp = function (time, callback) {
+            var distanceTime = 0,//距离的时间天数
+                week = 0,//下个日期是星期几
+                hour = 0;//下个日期的小时
+            var thisTime = this.thisTime;
+            if (time < 100) {
+                week = 0;
+                hour = time;
+            } else {
+                week = time.toString().substr(0, 1);
+                hour = time.toString().substr(1, 2);
+            }
+            if (thisTime.getDay() <= week) {
+                distanceTime = Number(week) - thisTime.getDay();
+            } else {
+                distanceTime = Number(week) + 7 - thisTime.getDay();
+            }
+            var returnTime = new Date(thisTime.getFullYear(), thisTime.getMonth(), thisTime.getDate() + Number(distanceTime), hour, 0);
+            this.nextTimeTimestamp = returnTime;
+            callback({
+                nextTimeTimestamp: this.nextTimeTimestamp,
+                isInTime: this.isInTime,
+                stringHint: this.stringHint
+            });
+        };
+        /**
+         * 获取string销售时间段
+         * */
+        this.getStringHint = function () {
+            var arr = ['日', '一', '二', '三', '四', '五', '六'];
+            var hint = this.seller.map(function (item, index, array) {
+                var str = '';
+                str += '星期' + arr[item[0][0]] + ' ' + item[0][1] + ':00-星期' + arr[item[1][0]] + ' ' + item[1][1] + ':00';
+                return str;
+            });
+            this.stringHint = hint;
+        };
+        /**
+         * 倒计时
+         * @param callback 回调函数
+         * @param startTime 距离下个时间段的时间戳
+         * @param thisTime 现在时间
+         * @return 倒计时显示string
+         * */
+        this.timeTimer = function (callback, startTime, thisTime) {
+            startTime = startTime || this.nextTimeTimestamp;
+            thisTime = thisTime || new Date();
+            var leftTime = startTime.getTime() - thisTime.getTime();
+            var dd = parseInt(leftTime / 1000 / 60 / 60 / 24, 10);//计算剩余的天数
+            var hh = parseInt(leftTime / 1000 / 60 / 60 % 24, 10);//计算剩余的小时数
+            var mm = parseInt(leftTime / 1000 / 60 % 60, 10);//计算剩余的分钟数
+            var ss = parseInt(leftTime / 1000 % 60, 10);//计算剩余的秒数
+            dd = this.checkTime(dd);
+            hh = this.checkTime(hh);
+            mm = this.checkTime(mm);
+            ss = this.checkTime(ss);//小于10的话加0
+            callback((dd > 0 ? dd + '天' + hh + ':' : '' + (hh > 0 ? hh + ':' : '')) + mm + ':' + ss);
+        };
+        this.checkTime = function (i) {
+            if (i < 10) {
+                i = "0" + i;
+            }
+            return i;
+        }
+    }
+
+</script>
+</body>
+</html>
