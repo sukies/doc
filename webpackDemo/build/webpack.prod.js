@@ -15,20 +15,35 @@ module.exports = merge(common, {
     module: {
         rules: [
             {
-                test: /\.css$/,
-                use: ExtractTextPlugin.extract({fallback: "style-loader", use: ["css-loader"]}),
-            },
-            {
-                test: /.less$/,
+                test: /.(css|less)$/,
                 use: ExtractTextPlugin.extract({
                     fallback: "style-loader",
-                    use: ["css-loader", {
-                        loader: "less-loader",
+                    use: [
+                        {
+                        loader: 'css-loader',
                         options: {
-                            /* ... */
+                            minimize: true //css压缩
                         }
-                    }]
+                    },
+                        {
+                            loader: "postcss-loader",
+                            options: {
+                                plugins: function () {
+                                    return [
+                                        require('autoprefixer')({
+                                            browsers: ["iOS >= 7", "Android >= 4", "> 5%"]
+                                        })
+                                    ]
+                                }
+                            }
+                        },
+                        {
+                            loader: "less-loader",
+                        }]
                 }),
+            },
+            {
+                test: /.(png|jpg)$/, loader: "url-loader?limit=1024&name=../img/[name].[ext]"
             },
         ]
     },
