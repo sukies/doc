@@ -1,0 +1,60 @@
+## 前言 ##
+最近都在做微信小程序，有踩一些坑，总结了一下
+## 一、关于登录 ##
+### app.js###
+在app.js文件中有一个onLaunch方法，小程序启动的时候会调用一次，可用来判读用户是否登录，登录状态是否失效
+[判断是否登录官方例子][1]
+
+## 二、css一些布局或样式问题##
+### 1.页面背景 ###
+整屏的背景可在wxml对应的wxss设置page
+
+```
+page {
+    display: block;
+    height: 100%;
+    background: url("https://XX.XXX.cn/bg.png") no-repeat center;
+    background-size: cover;
+}
+```
+### 2.wxss中写css需要注意的地方 ###
+wxss中的背景图不能是本地的，一定要网络图片。
+
+单位最好是用rpx
+
+不需要写加前缀的样式
+
+不支持复杂的选择器方法，比如说+、>，支持的选择器方法可以嵌套，但是最好要避免不要嵌套太多层
+[具体选择器支持方法][2]
+
+## 三、普通html转小程序(js部分基本都要重写，可复制不多)##
+### 1.html转wxml ###
+a.像div、h1、h2、section等块级元素全部转为view标签
+b.像span、i、em等行内块级元素全部转换转为text标签
+c.img转为image
+d.a转为navigator
+e.其他内容参考组件修改，表单基本都有对应的组件
+### 2.css转wxss ###
+a.选择器复杂的需要修改
+b.标签名需要修改成对应的（经验告诉我们下次最好不要用属性选择器，用类选择器！！）
+c.如果原来是用less写的rem单位，可以直接把rem全部替换为*100rpx，图片的域名不变部分最好也提取出来，不然正式的话改一遍域名也是很痛苦的
+### 3.详情页转换 ###
+一般后台的详情内容都是html的，这就比较坑了，不过网上有一些转码的插件
+现在可以插入页面了，不过我还没有试过，下次试试再说
+
+
+## 路径##
+### 1.跳转路径 ###
+小程序中可以用相对路径：'../../redirect',
+也可以用绝对路径:'/page/index/index'。
+### 2.弹出框路径 ###
+wx.showToast(OBJECT)这个路径只能是本地路径，不支持网络图片
+### 3.小程序绑定公众号后按钮绑定小程序里面的页面 ###
+小程序绑定公众号后按钮绑定小程序里面的页面:'pages/login/login'
+
+
+## 总结##
+暂时只想到这么多需要注意的地方，其他的下次想到再更
+
+  [1]: https://mp.weixin.qq.com/debug/wxadoc/dev/api/api-login.html#wxchecksessionobject
+  [2]: https://mp.weixin.qq.com/debug/wxadoc/dev/framework/view/wxss.html
