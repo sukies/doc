@@ -1,7 +1,5 @@
 # doc
 一些学习笔记
-## 移动开发 ##
-<a href="移动开发总结.md">移动开发总结</a>
 
 <h2>webpack</h2>
 <a href="webpackDemo">webpack学习总结</a>
